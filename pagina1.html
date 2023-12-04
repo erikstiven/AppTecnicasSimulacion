@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD para λ, μ y N</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button {
+            padding: 15px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        table {
+            width: 50%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>CRUD para λ, μ y N</h1>
+
+    <label for="lambda">λ (Tasa de llegada):</label>
+    <input type="text" id="lambda" placeholder="Ingrese λ">
+
+    <label for="miu">μ (Tasa de servicio):</label>
+    <input type="text" id="miu" placeholder="Ingrese μ">
+
+    <label for="n">N (Número de eventos):</label>
+    <input type="text" id="n" placeholder="Ingrese N">
+
+    <button onclick="verificarEstabilidad()">Agregar Valor</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>λ</th>
+                <th>μ</th>
+                <th>p</th>
+                <th>p<sub>0</sub></th>
+                <th>N</th>
+                <th>P<sub>n</sub></th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tablaDatos">
+            <!-- Aquí se mostrarán los valores ingresados -->
+        </tbody>
+    </table>
+
+    <script>
+        let id = 1;
+
+        function verificarEstabilidad() {
+            const lambda = parseFloat(document.getElementById('lambda').value);
+            const miu = parseFloat(document.getElementById('miu').value);
+            const n = parseInt(document.getElementById('n').value);
+
+            if (!isNaN(lambda) && !isNaN(miu) && !isNaN(n) && lambda > 0 && miu > 0 && n >= 0) {
+                const estabilidad = lambda / miu;
+
+                if (estabilidad < 1) {
+                    const p0 = 1 - (lambda / miu);
+                    const p = lambda / miu;
+                    const pn = p0 * (Math.pow(p, n));
+                    
+                    alert(`El sistema es estable. Calculando p = ${p.toFixed(2)}, p0 = ${p0.toFixed(2)}, Pn = ${pn.toFixed(4)}`);
+                    
+                    agregarValor(lambda, miu, p, p0, n, pn);
+                } else {
+                    alert('El sistema no es estable. La condición λ/μ < 1 no se cumple.');
+                }
+            } else {
+                alert('Por favor, ingrese valores numéricos positivos para λ, μ y un número entero no negativo para N.');
+            }
+        }
+
+        function agregarValor(lambda, miu, p, p0, n, pn) {
+            const fila = `<tr>
+                            <td>${id}</td>
+                            <td>${lambda}</td>
+                            <td>${miu}</td>
+                            <td>${p.toFixed(2)}</td>
+                            <td>${p0.toFixed(2)}</td>
+                            <td>${n}</td>
+                            <td>${pn.toFixed(4)}</td>
+                            <td>
+                                <button onclick="editarValor(${id})">Editar</button>
+                                <button onclick="eliminarValor(${id})">Eliminar</button>
+                            </td>
+                          </tr>`;
+            document.getElementById('tablaDatos').innerHTML += fila;
+            id++;
+            limpiarCampos();
+        }
+
+        function editarValor(id) {
+            // Aquí puedes implementar la lógica para editar un valor específico
+            // Puedes abrir un modal con los campos prellenados para edición
+            alert(`Editar el valor con ID ${id}`);
+        }
+
+        function eliminarValor(id) {
+            const confirmacion = confirm(`¿Está seguro de eliminar el valor con ID ${id}?`);
+            if (confirmacion) {
+                const fila = document.querySelector(`#tablaDatos tr:nth-child(${id})`);
+                fila.remove();
+            }
+        }
+
+        function limpiarCampos() {
+            document.getElementById('lambda').value = '';
+            document.getElementById('miu').value = '';
+            document.getElementById('n').value = '';
+        }
+    </script>
+</body>
+</html>
